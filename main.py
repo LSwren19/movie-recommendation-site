@@ -2,6 +2,17 @@ from bakery import assert_equal
 from dataclasses import dataclass
 from drafter import *
 
+set_website_title("Movie Recommendation")
+set_site_information(
+    author="Logan Wren",
+    description="Easy way to find a movie to watch.",
+    sources="Thanks to the Drafter docs and LLM",
+    planning=[""],
+    links=["https://github.com/your-username/your-repository"]
+)
+hide_debug_information()
+set_website_framed(False)
+
 @dataclass
 class Movie:
     title: str
