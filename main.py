@@ -1,10 +1,7 @@
 from bakery import assert_equal
 from dataclasses import dataclass
 from drafter import *
-    '''
-    Import statements make it possible to use asserts, dataclasses, and drafter.
-    The following small function give basic information about the website itself with the author, short description, and more.
-    '''
+
 
 set_website_title("Movie Recommendation")
 set_site_information(
