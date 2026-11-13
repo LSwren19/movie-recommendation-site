@@ -8,7 +8,7 @@ set_site_information(
     description="Easy way to find a movie to watch.",
     sources="Thanks to the Drafter docs and LLM",
     planning=[""],
-    links=["https://lswren19.github.io/movie-recommendation-site/"]
+    links=["https://github.com/LSwren19/movie-recommendation-site"]
 )
 hide_debug_information()
 set_website_framed(False)
