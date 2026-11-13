@@ -1,6 +1,10 @@
 from bakery import assert_equal
 from dataclasses import dataclass
 from drafter import *
+    '''
+Import statements make it possible to use asserts, dataclasses, and drafter.
+The following small function give basic information about the website itself with the author, short description, and more.
+    '''
 
 set_website_title("Movie Recommendation")
 set_site_information(
@@ -15,6 +19,10 @@ set_website_framed(False)
 
 @dataclass
 class Movie:
+    '''
+Represents a movie in a collection of movies
+title: name of the movie, genre: genre of the movie, length: movie runtime in minutes, era: decade the movie was released.
+    '''
     title: str
     genre: str
     length: int
@@ -22,12 +30,19 @@ class Movie:
 
 @dataclass
 class State:
+    '''
+Stores the users selections and movie recommendation
+genre: genre selected by user, movie_length: selected movie runtime, movie_era: selected release date decade, recommendations: list of movies matching the users selections
+    '''
     genre: str
     movie_length: int
     movie_era: str
     recommendations: list[Movie]
     
 MOVIES = [
+
+# A dataset of movies is provided as possible recommendations. There is a movie that fits every possible combination the user could enter, leaving no black recommendations or errors.
+
     # COMEDY
 
     # 1990s
@@ -119,17 +134,27 @@ MOVIES = [
 @route
 def index(state: State) -> Page:
     '''
+This is how the Movie Generator Home Page is displayed
+Args - An introduction is provided as well as a path to follow along with
+Returns - state: the current website, Page containing the home page content
     '''
     return Page(state, [
         Header("Movie Generator"),
         Header("A tool to speed up the movie finding process", 2),
         Button("Select Genre", "select_genre")
     ])
-        
+
+assert_equal(index(State("Comedy", 1, "2020s", [])).state.genre, "Comedy")
+assert_equal(index(State("Horror", 2, "2010s", [])).state.movie_length, 2)
 
 @route
 def select_genre(state: State, genre: str = '')-> Page:
     '''
+This is how the Select Genre Page is displayed
+The user is prompted with buttons, and the one they click is stored in State
+Button for Comedy, Horror, Action, and Fantasy
+Args - state: current website state, genre: users selected genre
+Returns - A Page displaying the available genres and a button to continue to the next section: movie length
     '''
     if genre:
         state.genre = genre
@@ -146,10 +171,18 @@ def select_genre(state: State, genre: str = '')-> Page:
                [Argument("genre", "Fantasy")]),
         Button("Select Length", "select_length"),
     ])
-    
+
+assert_equal(select_genre(State("", 1, "2020s", []), "Comedy").state.genre, "Comedy")
+assert_equal(select_genre(State("", 2, "2010s", []), "Horror").state.genre, "Horror")
+
 @route
 def select_length(state: State, length: int = 0) -> Page:
     '''
+This is how the Select Length Page is displayed
+The user is prompted with buttons, and the one they click is stored in State
+Button for Under 90 mins, between 90-120 mins, over 120 mins
+Args - state: current website state, length: users selected length
+Returns - A Page displaying the available lengths and a button to continue to the next section: movie era
     '''
     if length:
         state.movie_length = length
@@ -165,9 +198,17 @@ def select_length(state: State, length: int = 0) -> Page:
         Button ("Select Era", "select_era"),
     ])
 
+assert_equal(select_length(State("Comedy", 0, "2020s", []), 1).state.movie_length, 1)
+assert_equal(select_length(State("Horror", 0, "2010s", []), 2).state.movie_length, 2)
+
 @route
 def select_era(state: State, era: str = '') -> Page:
     '''
+This is how the Select Era Page is displayed
+The user is prompted with buttons, and the one they click is stored in State
+Button for 90s, 00s, 10s, 20s
+Args - state: current website state, era: users selected era
+Returns - A Page displaying the available eras and a button to continue to the next section: get recommendations
     '''
     if era:
         state.movie_era = era
@@ -185,8 +226,17 @@ def select_era(state: State, era: str = '') -> Page:
         Button ("Get Recommendations", "get_recommendations"),
     ])
 
+assert_equal(select_era(State("Comedy", 1, "", []), "2020s").state.movie_era, "2020s")
+assert_equal(select_era(State("Horror", 2, "", []), "2010s").state.movie_era, "2010s")
+
 @route
 def get_recommendations(state: State) -> Page:
+    '''
+Matchs the users selected preferences with a specific movie from the dataset
+Every movie in movies is compared to the users preference for the perfect match, when a movie matches the recommendation preferences it will be added to the recommendations list
+Args - state: website with the users selected genre, movie length, and era
+Returns - results page displaying the matching movies
+    '''
     state.recommendations  = []
     for movie in MOVIES:
         if movie.genre == state.genre and movie.era == state.movie_era:
@@ -198,20 +248,39 @@ def get_recommendations(state: State) -> Page:
                 state.recommendations.append(movie)
     return results(state)
 
+assert_equal(get_recommendations(State("Comedy", 1, "2020s", [])).state.recommendations, [Movie("Bad Trip", "Comedy", 84, "2020s")])
+assert_equal(get_recommendations(State("Horror", 2, "2010s", [])).state.recommendations, [Movie("Get Out", "Horror", 104, "2010s")])
+
 @route
 def results(state: State) -> Page:
+    '''
+Displays the users movie recommendation based off their previous selections
+Args - state: current website state including the list of recommended movies
+Returns - Page displaying the movie recommendation and a return home button
+    '''
     return Page(state, [
         Header("Your Movie Recommendation"),
         Table(state.recommendations),
         Button("Return Home", "return_home")
     ])
 
+assert_equal(results(State("Comedy", 1, "2020s", [])).state.genre, "Comedy")
+assert_equal(results(State("Horror", 2, "2010s", [])).state.movie_era, "2010s")
+
 @route
 def return_home(state: State) -> Page:
+    '''
+Resets the website state to original empty or 0 values 
+Args - state: current website state
+Returns - Page displaying the Movie Generator home page with base values
+    '''
     state.genre = ""
     state.movie_length = 0
     state.movie_era = ""
     state.recommendations = []
     return index(state)
-    
+
+assert_equal(return_home(State("Comedy", 1, "2020s", [])).state, State("", 0, "", []))
+assert_equal(return_home(State("Horror", 2, "2010s", [])).state, State("", 0, "", []))
+
 start_server(State("", 0, "", []))
