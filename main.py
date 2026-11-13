@@ -227,28 +227,6 @@ assert_equal(select_era(State("Comedy", 1, "", []), "2020s").state.movie_era, "2
 assert_equal(select_era(State("Horror", 2, "", []), "2010s").state.movie_era, "2010s")
 
 @route
-def get_recommendations(state: State) -> Page:
-    '''
-    Matchs the users selected preferences with a specific movie from the dataset
-    Every movie in movies is compared to the users preference for the perfect match, when a movie matches the recommendation preferences it will be added to the recommendations list
-    Args - state: website with the users selected genre, movie length, and era
-    Returns - results page displaying the matching movies
-    '''
-    state.recommendations  = []
-    for movie in MOVIES:
-        if movie.genre == state.genre and movie.era == state.movie_era:
-            if state.movie_length == 1 and movie.length < 90:
-                state.recommendations.append(movie)
-            elif state.movie_length == 2 and movie.length >= 90 and movie.length <= 120:
-                state.recommendations.append(movie)
-            elif state.movie_length == 3 and movie.length > 120:
-                state.recommendations.append(movie)
-    return results(state)
-
-assert_equal(get_recommendations(State("Comedy", 1, "2020s", [])).state.recommendations, [Movie("Bad Trip", "Comedy", 84, "2020s")])
-assert_equal(get_recommendations(State("Horror", 2, "2010s", [])).state.recommendations, [Movie("Get Out", "Horror", 104, "2010s")])
-
-@route
 def results(state: State) -> Page:
     '''
     Displays the users movie recommendation based off their previous selections
@@ -260,6 +238,31 @@ def results(state: State) -> Page:
         Table(state.recommendations),
         Button("Return Home", "return_home")
     ])
+
+
+@route
+def get_recommendations(state: State) -> Page:
+    '''
+    Matchs the users selected preferences with a specific movie from the dataset
+    Every movie in movies is compared to the users preference for the perfect match, when a movie matches the recommendation preferences it will be added to the recommendations list
+    Args - state: website with the users selected genre, movie length, and era
+    Returns - results page displaying the matching movies
+    '''
+    state.recommendations = []
+    for movie in MOVIES:
+        if movie.genre == state.genre and movie.era == state.movie_era:
+            if state.movie_length == 1 and movie.length < 90:
+                state.recommendations.append(movie)
+            elif state.movie_length == 2 and movie.length >= 90 and movie.length <= 120:
+                state.recommendations.append(movie)
+            elif state.movie_length == 3 and movie.length > 120:
+                state.recommendations.append(movie)
+    return results(state)
+
+
+assert_equal(get_recommendations(State("Comedy", 1, "2020s", [])).state.recommendations, [Movie("Bad Trip", "Comedy", 84, "2020s")])
+assert_equal(get_recommendations(State("Horror", 2, "2010s", [])).state.recommendations, [Movie("Get Out", "Horror", 104, "2010s")])
+
 
 assert_equal(results(State("Comedy", 1, "2020s", [])).state.genre, "Comedy")
 assert_equal(results(State("Horror", 2, "2010s", [])).state.movie_era, "2010s")
